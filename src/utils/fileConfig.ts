@@ -17,8 +17,7 @@ let _parsedConfig: Record<string, any> | null = null;
 const configFile = process.env.NAMED_CONFIGS_FILE ?? './named_configs.json';
 
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { readFileSync } = require('fs') as typeof import('fs');
+  const { readFileSync } = await import('fs');
   const raw = readFileSync(configFile, 'utf-8');
   _parsedConfig = resolveEnvVars(JSON.parse(raw));
   console.log('✅ gateway config loaded from', configFile);
@@ -63,11 +62,12 @@ const hasNamedConfigs: boolean = (() => {
  */
 function namedConfig(name?: string | null): string | null {
   const key = name || 'default';
-  const result = _parsedConfig?.named_configs?.[key] ?? null;
+  let result = _parsedConfig?.named_configs?.[key] ?? null;
   if (result) {
-    return JSON.stringify(result);
+	result = JSON.stringify(result);
   }
-  return null;
+  console.warn("namedConfig(", name, ") =", result)
+  return result ?? null;
 }
 
 /**
