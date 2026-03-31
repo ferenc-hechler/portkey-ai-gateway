@@ -37,7 +37,7 @@ import { PreRequestValidatorService } from './services/preRequestValidatorServic
 import { ProviderContext } from './services/providerContext';
 import { RequestContext } from './services/requestContext';
 import { ResponseService } from './services/responseService';
-import { processNamedConfig } from '../utils/fileConfig';
+import { processNamedConfig } from '../utils/namedConfigs';
 
 function constructRequestBody(
   requestContext: RequestContext,

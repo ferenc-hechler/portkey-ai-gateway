@@ -134,7 +134,7 @@ const nodeEnv = {
     process.env.TRUSTED_CUSTOM_HOSTS
   ),
   
-  NAMED_CONFIGS_FILE: process.env.NAMED_CONFIGS_FILE,
+  NAMED_CONFIGS: getValueOrFileContents(process.env.NAMED_CONFIGS),
 };
 
 export const Environment = (c?: Context) => {

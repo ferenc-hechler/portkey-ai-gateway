@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono';
 import { HEADER_KEYS } from '../globals';
 import { env } from 'hono/adapter';
-import { processNamedConfig } from '../utils/fileConfig';
+import { processNamedConfig } from '../utils/namedConfigs';
 
 /**
  * Handles the models request. Returns a list of models supported by the Ai gateway.

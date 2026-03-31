@@ -13,28 +13,19 @@
  */
 import { Environment } from './env';
 
-const namedConfigsFile = Environment()?.NAMED_CONFIGS_FILE || "./named_configs.json";
-
-console.log('NAMED_CONFIGS_FILE', namedConfigsFile);
-
-
 let _parsedConfig: Record<string, any> | null = null;
 
-
 try {
-  const { readFileSync } = await import('fs');
-  const raw = readFileSync(namedConfigsFile, 'utf-8');
-  _parsedConfig = resolveEnvVars(JSON.parse(raw));
-  console.log('✅ gateway config loaded from', namedConfigsFile);
-} catch (err: any) {
-  if (err?.code === 'ENOENT') {
-    // File simply doesn't exist — that's fine, no default config
-  } else {
-    console.warn(
-      '⚠️  Could not load default gateway config from config.json:',
-      err?.message
-    );
+  const namedConfigs =Environment()?.NAMED_CONFIGS;
+  if (namedConfigs) {
+    _parsedConfig = resolveEnvVars(JSON.parse(namedConfigs));
+    console.log('✅ NAMED_CONFIGS loaded successfully.');
   }
+} catch (err: any) {
+  console.warn(
+    '⚠️  invalid NAMED_CONFIGS:',
+      err?.message
+  );
 }
 
 /**
@@ -46,9 +37,9 @@ const hasNamedConfigs: boolean = (() => {
 
 
 /**
- * Returns a named config from `config.json`'s `named_configs` map by name.
+ * Returns a named config from `named_config.json`'s `named_configs` map by name.
  *
- * Example config.json:
+ * Example named_config.json:
  * ```json
  * {
  *   "named_configs": {
@@ -107,4 +98,4 @@ function resolveEnvVars(obj: any): any {
   return obj;
 }
 
-export { processNamedConfig, resolveEnvVars };
+export { processNamedConfig };

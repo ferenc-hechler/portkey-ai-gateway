@@ -7,7 +7,7 @@ import {
 } from '../../globals';
 import { configSchema } from './schema/config';
 import { Environment } from '../../utils/env';
-import { processNamedConfig } from '../../utils/fileConfig';
+import { processNamedConfig } from '../../utils/namedConfigs';
 
 // Regex patterns for validation (defined once for reusability)
 const VALIDATION_PATTERNS = {
