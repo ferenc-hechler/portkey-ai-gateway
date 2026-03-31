@@ -165,9 +165,7 @@ export const requestValidator = (c: Context, next: any) => {
 
   if (x_config) {
     try {
-	  console.warn('⚠️  Validating x_config:', x_config);
       const parsedConfig = JSON.parse(x_config);
-	  console.warn('⚠️  parsedConfig:', parsedConfig);
       if (
         !requestHeaders[`x-${POWERED_BY}-provider`] &&
         !(parsedConfig.provider || parsedConfig.targets)

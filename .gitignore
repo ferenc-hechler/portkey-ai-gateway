@@ -151,6 +151,3 @@ src/handlers/tests/.creds.json
 # Eclipse IDE
 /.project
 /.settings/
-
-# TEMP
-/named_configs.json
