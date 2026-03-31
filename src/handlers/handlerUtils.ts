@@ -37,7 +37,7 @@ import { PreRequestValidatorService } from './services/preRequestValidatorServic
 import { ProviderContext } from './services/providerContext';
 import { RequestContext } from './services/requestContext';
 import { ResponseService } from './services/responseService';
-import { defaultConfig } from '../utils/defaultConfig';
+import { processNamedConfig } from '../utils/fileConfig';
 
 function constructRequestBody(
   requestContext: RequestContext,
@@ -1024,19 +1024,9 @@ export function constructConfigFromRequestHeaders(
       : [],
   };
 
-  console.warn('⚠️  [hU] requestHeaders[`x-${POWERED_BY}-config`]:', requestHeaders[`x-${POWERED_BY}-config`]);
-  
-  if (!requestHeaders[`x-${POWERED_BY}-config`] && defaultConfig) {
-      // Inject the server-side default config so downstream handlers can use it transparently
-      requestHeaders[`x-${POWERED_BY}-config`] = defaultConfig;
-      console.warn('⚠️  injecting defaultConfig:', defaultConfig);
-  }
-
-  console.warn('⚠️  [hU] requestHeaders[`x-${POWERED_BY}-config`]:', requestHeaders[`x-${POWERED_BY}-config`]);
-  
-  if (requestHeaders[`x-${POWERED_BY}-config`]) {
-    let parsedConfigJson = JSON.parse(requestHeaders[`x-${POWERED_BY}-config`]);
-	console.warn('⚠️  parsedConfigJson:', parsedConfigJson);
+  const x_config = processNamedConfig(requestHeaders[`x-${POWERED_BY}-config`]);
+  if (x_config) {
+    let parsedConfigJson = JSON.parse(x_config);
     parsedConfigJson.default_input_guardrails = defaultsConfig.input_guardrails;
     parsedConfigJson.default_output_guardrails =
       defaultsConfig.output_guardrails;

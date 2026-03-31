@@ -7,7 +7,7 @@ import {
 } from '../../globals';
 import { configSchema } from './schema/config';
 import { Environment } from '../../utils/env';
-import { defaultConfig } from '../../utils/defaultConfig';
+import { processNamedConfig } from '../../utils/fileConfig';
 
 // Regex patterns for validation (defined once for reusability)
 const VALIDATION_PATTERNS = {
@@ -109,30 +109,25 @@ export const requestValidator = (c: Context, next: any) => {
     );
   }
 
+  const x_config = processNamedConfig(requestHeaders[`x-${POWERED_BY}-config`]);
   if (
     !(
-      requestHeaders[`x-${POWERED_BY}-config`] ||
+      x_config ||
       requestHeaders[`x-${POWERED_BY}-provider`]
     )
   ) {
-    if (defaultConfig) {
-      // Inject the server-side default config so downstream handlers can use it transparently
-      requestHeaders[`x-${POWERED_BY}-config`] = defaultConfig;
-	  console.warn('⚠️  injecting defaultConfig:', defaultConfig);
-    } else {
-      return new Response(
-        JSON.stringify({
-          status: 'failure',
-          message: `Either x-${POWERED_BY}-config or x-${POWERED_BY}-provider header is required`,
-        }),
-        {
-          status: 400,
-          headers: {
-            'content-type': 'application/json',
-          },
-        }
-      );
-    }
+    return new Response(
+      JSON.stringify({
+        status: 'failure',
+        message: `Either x-${POWERED_BY}-config or x-${POWERED_BY}-provider header is required`,
+      }),
+      {
+        status: 400,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    );
   }
   if (
     requestHeaders[`x-${POWERED_BY}-provider`] &&
@@ -168,10 +163,10 @@ export const requestValidator = (c: Context, next: any) => {
     );
   }
 
-  if (requestHeaders[`x-${POWERED_BY}-config`]) {
+  if (x_config) {
     try {
-	  console.warn('⚠️  requestHeaders[`x-${POWERED_BY}-config`]:', requestHeaders[`x-${POWERED_BY}-config`]);
-      const parsedConfig = JSON.parse(requestHeaders[`x-${POWERED_BY}-config`]);
+	  console.warn('⚠️  Validating x_config:', x_config);
+      const parsedConfig = JSON.parse(x_config);
 	  console.warn('⚠️  parsedConfig:', parsedConfig);
       if (
         !requestHeaders[`x-${POWERED_BY}-provider`] &&
