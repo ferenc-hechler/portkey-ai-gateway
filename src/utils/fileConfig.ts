@@ -19,8 +19,8 @@ const configFile = process.env.NAMED_CONFIGS_FILE ?? './named_configs.json';
 try {
   const { readFileSync } = await import('fs');
   const raw = readFileSync(configFile, 'utf-8');
-  _parsedConfig = JSON.parse(raw);
-  console.log('✅ gateway config loaded from config.json');
+  _parsedConfig = resolveEnvVars(JSON.parse(raw));
+  console.log('✅ gateway config loaded from', configFile);
 } catch (err: any) {
   if (err?.code === 'ENOENT') {
     // File simply doesn't exist — that's fine, no default config
@@ -82,6 +82,24 @@ function processNamedConfig(config?: string | null): Record<string, any> | null 
 	return namedConfig(config);
   }
   return config;
+}
+
+/**
+ * Recursively replaces "$VAR_NAME" placeholders in all string values
+ * of a config object with the corresponding environment variable values.
+ * If the environment variable is not set, the placeholder is left as-is.
+ */
+function resolveEnvVars(obj: any): any {
+  if (typeof obj === 'string') {
+    return obj.replace(/\$([A-Z_][A-Z0-9_]*)/g, (_, varName) => process.env[varName] ?? `$${varName}`);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(resolveEnvVars);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, resolveEnvVars(v)]));
+  }
+  return obj;
 }
 
 export { processNamedConfig };
