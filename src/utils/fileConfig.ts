@@ -17,7 +17,8 @@ let _parsedConfig: Record<string, any> | null = null;
 const configFile = process.env.NAMED_CONFIGS_FILE ?? './named_configs.json';
 
 try {
-  const { readFileSync } = await import('fs');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { readFileSync } = require('fs') as typeof import('fs');
   const raw = readFileSync(configFile, 'utf-8');
   _parsedConfig = resolveEnvVars(JSON.parse(raw));
   console.log('✅ gateway config loaded from', configFile);
@@ -60,14 +61,13 @@ const hasNamedConfigs: boolean = (() => {
  * @param name - The key inside `named_configs` to look up.
  * @returns The named config as a plain object, or null if not found.
  */
-function namedConfig(name?: string | null): Record<string, any> | null {
+function namedConfig(name?: string | null): string | null {
   const key = name || 'default';
-  let result = _parsedConfig?.named_configs?.[key] ?? null;
+  const result = _parsedConfig?.named_configs?.[key] ?? null;
   if (result) {
-	result = JSON.stringify(result)
+    return JSON.stringify(result);
   }
-  console.warn("namedConfig(", name, ") =", result)
-  return result;
+  return null;
 }
 
 /**
@@ -77,11 +77,11 @@ function namedConfig(name?: string | null): Record<string, any> | null {
  * @param name - The key inside `named_configs` to look up, or null/undefined to use "default".
  * @returns The named config as a plain object, or null if not found or if named configs are unavailable.
  */
-function processNamedConfig(config?: string | null): Record<string, any> | null {
+function processNamedConfig(config?: string | null): string | null {
   if (hasNamedConfigs) {
-	return namedConfig(config);
+    return namedConfig(config);
   }
-  return config;
+  return config ?? null;
 }
 
 /**
