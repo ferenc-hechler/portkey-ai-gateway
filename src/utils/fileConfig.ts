@@ -107,4 +107,4 @@ function resolveEnvVars(obj: any): any {
   return obj;
 }
 
-export { processNamedConfig };
+export { processNamedConfig, resolveEnvVars };
