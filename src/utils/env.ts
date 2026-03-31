@@ -5,8 +5,10 @@ const isNodeInstance = getRuntimeKey() == 'node';
 let path: any;
 let fs: any;
 if (isNodeInstance) {
-  path = await import('path');
-  fs = await import('fs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  path = require('path');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  fs = require('fs');
 }
 
 export function getValueOrFileContents(value?: string, ignore?: boolean) {

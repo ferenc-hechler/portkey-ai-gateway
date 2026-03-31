@@ -11,7 +11,17 @@
  *        }
  *      }
  */
+import { getRuntimeKey } from 'hono/adapter';
 import { Environment } from './env';
+
+console.log('getRuntimeKey() =', getRuntimeKey());
+
+const isNodeInstance = getRuntimeKey() == 'node';
+let fs: any;
+if (isNodeInstance) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  fs = require('fs');
+}
 
 const namedConfigsFile = Environment()?.NAMED_CONFIGS_FILE || "./named_configs.json";
 
@@ -22,8 +32,7 @@ let _parsedConfig: Record<string, any> | null = null;
 
 
 try {
-  const { readFileSync } = await import('fs');
-  const raw = readFileSync(namedConfigsFile, 'utf-8');
+  const raw = fs.readFileSync(namedConfigsFile, 'utf-8');
   _parsedConfig = resolveEnvVars(JSON.parse(raw));
   console.log('✅ gateway config loaded from', namedConfigsFile);
 } catch (err: any) {
@@ -107,4 +116,4 @@ function resolveEnvVars(obj: any): any {
   return obj;
 }
 
-export { processNamedConfig };
+export { processNamedConfig, resolveEnvVars };
