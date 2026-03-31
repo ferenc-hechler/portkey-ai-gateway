@@ -11,16 +11,21 @@
  *        }
  *      }
  */
+import { Environment } from './env';
+
+const namedConfigsFile = Environment()?.NAMED_CONFIGS_FILE || "./named_configs.json";
+
+console.log('NAMED_CONFIGS_FILE', namedConfigsFile);
+
 
 let _parsedConfig: Record<string, any> | null = null;
 
-const configFile = process.env.NAMED_CONFIGS_FILE ?? './named_configs.json';
 
 try {
   const { readFileSync } = await import('fs');
-  const raw = readFileSync(configFile, 'utf-8');
+  const raw = readFileSync(namedConfigsFile, 'utf-8');
   _parsedConfig = resolveEnvVars(JSON.parse(raw));
-  console.log('✅ gateway config loaded from', configFile);
+  console.log('✅ gateway config loaded from', namedConfigsFile);
 } catch (err: any) {
   if (err?.code === 'ENOENT') {
     // File simply doesn't exist — that's fine, no default config
